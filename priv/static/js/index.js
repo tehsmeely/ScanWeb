@@ -75,6 +75,7 @@ $(function(){
 	socket.onopen = function(){
 		console.log("SOCKET OPEN");
 		setConnectionUp();
+		getAllImages();
 		pingIntervalId = setInterval(sendPing, 5000);
 	}
 	socket.onclose = function(){
@@ -164,8 +165,11 @@ $(function(){
 				img.width = img.width * ratio;
 			}
 			var li = $( document.createElement('li') ),
+				a = $( document.createElement('a')),
 				container = $(".outputList ul");
-			li.append(img)
+			a.attr("href", img.src);
+			a.append(img);
+			li.append(a)
 			container.prepend(li); 
 		};
 		img.src = "/scans/" + image;
@@ -179,5 +183,4 @@ $(function(){
 		socket.send(JSON.stringify(formObject));
 	}
 	$("#reloadButton").click(getAllImages);
-	getAllImages();
 })
