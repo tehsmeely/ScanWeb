@@ -5,16 +5,18 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
+    file_manager:compile_and_render(),
     Dispatch = cowboy_router:compile([
         {'_', [
             {"/", cowboy_static, {priv_file, scanweb, "static/html/index.html"}},
             {"/socket/", scan_socket_handler, #{activeScan=>false}},
             {"/static/js/[...]", cowboy_static, {priv_dir, scanweb, "static/js"}},
             {"/static/css/[...]", cowboy_static, {priv_dir, scanweb, "static/css"}},
-            {"/scans/[...]", cowboy_static, {dir, "/home/pi/scanweb/priv/scans"}}
+            {"/scans/[...]", cowboy_static, {priv_dir, scanweb, "scans"}},
+            {"/api/", scan_rest_api_handler, #{activeScan=>false}}
         ]}
     ]),
-    {ok, _} = cowboy:start_clear(scan_http_listener, 100,
+    {ok, _} = cowboy:start_clear(scan_http_listener,
         [{port, 8080}],
         #{env => #{dispatch => Dispatch}}
     ),
@@ -22,3 +24,4 @@ start(_Type, _Args) ->
 
 stop(_State) ->
 	ok.
+

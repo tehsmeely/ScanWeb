@@ -4,7 +4,7 @@
 
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2]).
 
--define(SCAN_DIR, "/home/pi/scanweb/priv/scans/").
+-define(SCAN_DIR, "/home/jonty/Erlang/scanweb/priv/scans/").
 
 init(Req, State) ->
 	io:format("Web Socket Init!~n"),

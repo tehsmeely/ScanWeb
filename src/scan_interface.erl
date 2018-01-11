@@ -1,8 +1,9 @@
 -module(scan_interface).
 
--export([start_scan/2]).
+-export([start_scan/2, start_scan/3]).
 
 -define(FILE_EXT, ".png").
+-define(TEST_LOG_PATH, "/home/jonty/scanweb/testlog.txt").
 
 -define(DEFAULT_RESOLUTION, "300").
 -define(VALID_RESOLUTIONS, ["75","100","200","300","600","1200"]).
@@ -14,6 +15,8 @@
 
 
 start_scan(Pid, Opts) ->
+    start_scan(Pid, Opts, false).
+start_scan(Pid, Opts, IsTest) ->
     io:format("Spawning scan proc~n"),
 
 
@@ -46,11 +49,13 @@ start_scan(Pid, Opts) ->
 
 
 
-    ScanPid = spawn(fun() -> do_scan(Pid, Resolution, Mode) end),
+    ScanPid = spawn(fun() -> do_scan(Pid, Resolution, Mode, IsTest) end),
     {ScanPid, {Resolution, Mode}}.
 
-
-do_scan(Pid, Resolution, Mode) ->
+% do_scan(Pid, Resolution, Mode) ->
+%     do_scan(Pid, Resolution, Mode, false).
+    
+do_scan(Pid, Resolution, Mode, IsTest) ->
     Num = erlang:unique_integer([positive]),
     InitFilename = io_lib:format("scan-~w.tiff", [Num]),
     InitFilepath = io_lib:format("~~/scanweb/priv/scans/~s", [InitFilename]),
@@ -59,22 +64,36 @@ do_scan(Pid, Resolution, Mode) ->
     io:format("Filename: ~s~n", [InitFilename]),
 
 
-
-    Cmd = io_lib:format("scanimage --resolution ~s --mode ~s --format tiff > ~s",
-        [
-            Resolution,
-            Mode,
-            InitFilepath
-        ]
-    ),
+    Cmd = case IsTest of
+        true ->
+            io_lib:format(
+                "date >> ~s; echo 'scanimage --resolution ~s --mode ~s --format tiff > ~s' >> ~s; sleep 5",
+                [
+                    ?TEST_LOG_PATH,
+                    Resolution,
+                    Mode,
+                    InitFilepath,
+                    ?TEST_LOG_PATH
+                ]);
+        false ->
+            io_lib:format("scanimage --resolution ~s --mode ~s --format tiff > ~s",
+                [
+                    Resolution,
+                    Mode,
+                    InitFilepath
+                ]
+            )
+    end,
     io:format("Command: ~s~n", [Cmd]),
     Output = os:cmd(Cmd),
     ReturnVal = os:cmd("echo $?"),
     io:format("Scan Return Val: ~p~n", [ReturnVal]),
     case ReturnVal of
-        "0\n" ->
+        "0\n" when IsTest=:=false->
             %convert then send it off
             convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath);
+        "0\n" when IsTest=:=true ->
+            Pid ! {scan, success, "test"};
         "1\n" ->
             %fail
             Pid ! {scan, fail, Output}        

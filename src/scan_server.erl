@@ -15,6 +15,8 @@
 		scanInfo => #{}
 	}).
 
+-define(TEST, true).
+
 start_link() -> 
 	io:format("Scan server starting~n"),
 	gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -39,7 +41,7 @@ handle_call(get_is_active, _From, State) ->
 handle_call({get_scan, Opts}, {ReqPid, _}, State) -> 
 	NewState = case maps:get(active, State) of
 		false ->
-			{NewScanPid, {FinalResolution, FinalMode}} = scan_interface:start_scan(self(), Opts),
+			{NewScanPid, {FinalResolution, FinalMode}} = scan_interface:start_scan(self(), Opts, ?TEST),
 			{ok, StartTime} = tempo:format_now(<<"%k:%M:%S UTC %a %e %b %Y">>, erlang:timestamp()),
 			% e.g. <<"21:40:05 UTC Sun 14 May 2017">> (n.b. is binary)
 			State#{

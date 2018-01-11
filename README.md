@@ -25,12 +25,12 @@ I have a CUPS printserver running on a raspberry pi connected to a usb printer/s
 
 Clone 
 ```
-git clone https://github.com/tehsmeely/ScanWeb.git
+git clone https://github.com/tehsmeely/ScanWeb.git scanweb
 ```
 and run make to install deps and build release
 ```
-cd ScanWeb
-make
+cd scanweb
+make erlang-mk; make distclean; make
 ```
 
 run release from release script

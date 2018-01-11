@@ -1,5 +1,6 @@
-/home/pi/scanweb/deps/cowboy
-/home/pi/scanweb/deps/cowlib
-/home/pi/scanweb/deps/ranch
-/home/pi/scanweb/deps/jiffy
-/home/pi/scanweb/deps/tempo
+/home/jonty/Erlang/scanweb/deps/cowboy
+/home/jonty/Erlang/scanweb/deps/cowlib
+/home/jonty/Erlang/scanweb/deps/ranch
+/home/jonty/Erlang/scanweb/deps/jiffy
+/home/jonty/Erlang/scanweb/deps/tempo
+/home/jonty/Erlang/scanweb/deps/mustache
