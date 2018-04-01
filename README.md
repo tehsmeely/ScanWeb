@@ -37,3 +37,9 @@ run release from release script
 ```
 _rel/scanweb_release/bin/scanweb_release start
 ```
+
+
+## Configure
+
+---
+

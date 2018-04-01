@@ -16,6 +16,14 @@ init([]) ->
         type => worker,
         modules => [scan_server]
     },
-	Procs = [ScanServer],
+    ConfigServer = #{
+        id => config_server, 
+        start => {config_server, start_link, []}, 
+        restart => permanent,
+        shutdown => 2000,
+        type => worker,
+        modules => [config_server]
+    },
+	Procs = [ScanServer, ConfigServer],
     %Procs = [],
 	{ok, {{one_for_one, 1, 5}, Procs}}.

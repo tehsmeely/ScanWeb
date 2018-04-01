@@ -5,6 +5,7 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
+    scanweb_sup:start_link(),
     file_manager:compile_and_render(),
     Dispatch = cowboy_router:compile([
         {'_', [
@@ -16,11 +17,11 @@ start(_Type, _Args) ->
             {"/api/", scan_rest_api_handler, #{activeScan=>false}}
         ]}
     ]),
+    Port = config_server:query_config(port, 8080),
     {ok, _} = cowboy:start_clear(scan_http_listener,
-        [{port, 8080}],
+        [{port, Port}],
         #{env => #{dispatch => Dispatch}}
-    ),
-    scanweb_sup:start_link().
+    ).
 
 stop(_State) ->
 	ok.
