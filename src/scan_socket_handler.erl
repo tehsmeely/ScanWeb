@@ -74,18 +74,8 @@ websocket_handle({text, FrameData}=Frame, State) ->
 
 websocket_info(sendFiles, State) ->
 	io:format("handler got sendFiles message~n"),
-	{ok, Filenames} = file:list_dir(?SCAN_DIR),
-	PngFiles = lists:filtermap(
-		fun(Filename) -> 
-			IsPng = string:right(Filename, 4) =:= ".png",
-			if IsPng ->
-				{true, list_to_binary(Filename)};
-			true ->
-				false
-			end
-		end,
-		Filenames
-	),
+
+
 	Resp = #{
 		<<"TYPE">> => <<"FILES">>,
 		<<"IMAGE_LIST">> => PngFiles
