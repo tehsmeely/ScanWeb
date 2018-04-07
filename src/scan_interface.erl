@@ -56,10 +56,13 @@ start_scan(Pid, Opts, IsTest) ->
 %     do_scan(Pid, Resolution, Mode, false).
     
 do_scan(Pid, Resolution, Mode, IsTest) ->
-    Num = erlang:unique_integer([positive]),
-    InitFilename = io_lib:format("scan-~w.tiff", [Num]),
+    NewFile = scanned_file_server:new_file(),
+    %Num = erlang:unique_integer([positive]),
+    %InitFilename = io_lib:format("scan-~w.tiff", [Num]),
+    InitFilename = scanned_file:get_raw_name(NewFile),
     InitFilepath = io_lib:format("~~/scanweb/priv/scans/~s", [InitFilename]),
-    ConvertFilename = io_lib:format("scan-~w~s", [Num, ?FILE_EXT]),
+    %ConvertFilename = io_lib:format("scan-~w~s", [Num, ?FILE_EXT]),
+    ConvertFilename = scanned_file:get_name(NewFile),
     ConvertFilepath = io_lib:format("~~/scanweb/priv/scans/~s", [ConvertFilename]),
     io:format("Filename: ~s~n", [InitFilename]),
 
@@ -91,17 +94,19 @@ do_scan(Pid, Resolution, Mode, IsTest) ->
     case ReturnVal of
         "0\n" when IsTest=:=false->
             %convert then send it off
-            convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath);
-        "0\n" when IsTest=:=true ->
+            convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath, NewFile);
+        "0\n" when IsTest=:=true ->        
+            scanned_file_server:confirm_new_file(NewFile),
             Pid ! {scan, success, "test"};
         "1\n" ->
             %fail
+            scanned_file_server:fail_new_file(NewFile),
             Pid ! {scan, fail, Output}        
     end.
 
 
 
-convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath) ->
+convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath, ScannedFile) ->
     Cmd = io_lib:format("convert ~s ~s", [InitFilepath, ConvertFilepath]),
     io:format("Converting File. Cmd: \"~s\"~n",[Cmd]),
     Output = os:cmd(Cmd),
@@ -109,7 +114,9 @@ convert_file(Pid, InitFilepath, ConvertFilename, ConvertFilepath) ->
     io:format("Convert Return Val: ~p~n", [ReturnVal]),
     case ReturnVal of
         "0\n" ->
+            scanned_file_server:confirm_new_file(ScannedFile),
             Pid ! {scan, success, ConvertFilename};
         "1\n" ->
+            scanned_file_server:fail_new_file(ScannedFile),
             Pid ! {scan, fail, Output}
     end.

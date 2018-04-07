@@ -74,12 +74,20 @@ websocket_handle({text, FrameData}=Frame, State) ->
 
 websocket_info(sendFiles, State) ->
 	io:format("handler got sendFiles message~n"),
-
-
-	Resp = #{
-		<<"TYPE">> => <<"FILES">>,
-		<<"IMAGE_LIST">> => PngFiles
-	},
+	Resp = case scanned_file_server:get_snapshot() of
+		{error, no_files} ->
+			#{
+				<<"TYPE">> => <<"FILES">>,
+				<<"FILES_EXIST">> => <<"FALSE">>
+			};
+		{ok, {Latest, All}} ->
+			#{
+				<<"TYPE">> => <<"FILES">>,
+				<<"FILES_EXIST">> => <<"TRUE">>,
+				<<"LATEST_IMAGE">> => Latest,
+				<<"IMAGE_LIST">> => All
+			}
+	end,
 	%Resp = list_to_binary(io_lib:format("Fail: Reason ~s", [Reason])),
 	JResp = jiffy:encode(Resp),
 	{reply, {text, JResp}, State};

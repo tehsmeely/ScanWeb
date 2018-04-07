@@ -5,8 +5,12 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
+    io:format("Starting...~n"),
     scanweb_sup:start_link(),
-    file_manager:compile_and_render(),
+    io:format("Servers Started~n"),
+    timer:sleep(1000),
+    io:format("startup: ~p~n",[config_server:query_config(port, 8080)]),
+    static_file_manager:compile_and_render(),
     Dispatch = cowboy_router:compile([
         {'_', [
             {"/", cowboy_static, {priv_file, scanweb, "static/html/index.html"}},
