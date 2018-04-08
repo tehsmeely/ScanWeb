@@ -6,7 +6,7 @@
 
 start(_Type, _Args) ->
     io:format("Starting...~n"),
-    scanweb_sup:start_link(),
+    Sup = scanweb_sup:start_link(),
     io:format("Servers Started~n"),
     timer:sleep(1000),
     io:format("startup: ~p~n",[config_server:query_config(port, 8080)]),
@@ -25,7 +25,8 @@ start(_Type, _Args) ->
     {ok, _} = cowboy:start_clear(scan_http_listener,
         [{port, Port}],
         #{env => #{dispatch => Dispatch}}
-    ).
+    ),
+    Sup.
 
 stop(_State) ->
 	ok.

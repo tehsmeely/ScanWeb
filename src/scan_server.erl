@@ -21,7 +21,7 @@ start_link() ->
 	io:format("Scan server starting~n"),
 	gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 init([]) ->
-	io:format("Scan server initiating~n"),
+	io:format("Scan server initiating, pid:~p~n",[self()]),
 	{ok, ?BLANKSTATE}.
 
 
@@ -81,3 +81,6 @@ handle_info(_Info, State) -> {noreply, State}.
 terminate(_Reason, _State) -> ok.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
+% Scan server initiating, pid:<0.434.0> 
+% Config server init, pid:<0.435.0>
+% scanned_file_server init, pid<0.437.0>
