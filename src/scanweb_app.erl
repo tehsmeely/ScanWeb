@@ -11,13 +11,14 @@ start(_Type, _Args) ->
     timer:sleep(1000),
     io:format("startup: ~p~n",[config_server:query_config(port, 8080)]),
     static_file_manager:compile_and_render(),
+    Scan_dir = config_server:query_config(scan_dir),
     Dispatch = cowboy_router:compile([
         {'_', [
             {"/", cowboy_static, {priv_file, scanweb, "static/html/index.html"}},
             {"/socket/", scan_socket_handler, #{activeScan=>false}},
             {"/static/js/[...]", cowboy_static, {priv_dir, scanweb, "static/js"}},
             {"/static/css/[...]", cowboy_static, {priv_dir, scanweb, "static/css"}},
-            {"/scans/[...]", cowboy_static, {priv_dir, scanweb, "scans"}},
+            {"/scans/[...]", cowboy_static, {dir, Scan_dir}},
             {"/api/", scan_rest_api_handler, #{activeScan=>false}}
         ]}
     ]),
