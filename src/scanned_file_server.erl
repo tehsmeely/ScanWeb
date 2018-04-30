@@ -27,6 +27,7 @@ init([]) ->
 
 %% API
 
+%CALLS
 get_all() ->
 	gen_server:call(?SERVER, {get_files, all}).
 get_latest() ->
@@ -36,15 +37,15 @@ get_snapshot() ->
 new_file() ->
 	gen_server:call(?SERVER, new_file).
 
-refresh_files() ->
-	gen_server:cast(?SERVER, refresh_files).
-
 confirm_new_file(Scanned_file) ->
 	gen_server:call(?SERVER, {update_pending, confirm, Scanned_file}).
 
 fail_new_file(Scanned_file) ->
 	gen_server:call(?SERVER, {update_pending, fail, Scanned_file}).
 
+%CASTS
+refresh_files() ->
+	gen_server:cast(?SERVER, refresh_files).
 
 %% Internal functions
 
@@ -88,6 +89,19 @@ convert_to_name_only(FileList) ->
 	,
 		FileList
 	).
+convert_to_file_and_description(FileList) ->
+	lists:map(
+		fun(Scanned_file) ->
+			[ scanned_file:get_name(Scanned_file)
+			,	list_to_binary(io_lib:format("~s (~s)", [
+					scanned_file:get_name(Scanned_file),
+					scanned_file:get_createdate(Scanned_file)
+				]))
+			]
+		end
+	,
+		FileList
+	).
 highest_num_of_list(List) ->
 	highest_num_of_list(List, 0).
 highest_num_of_list([], Highest)->
@@ -124,8 +138,10 @@ handle_call({get_files, GetWhich}, _From, State) ->
 			end;
 		snap ->
 			case Files of
-				[] -> {error, no_files};
-				[Latest | _] -> {ok, {Latest, Files}}
+				[] -> 
+					{error, no_files};
+				[Latest | _] -> 
+					{ok, {Latest, convert_to_file_and_description(State#state.files)}}
 			end
 	end,
 	{reply, Reply, State};
@@ -155,6 +171,7 @@ handle_call({update_pending, Status, Scanned_file}, _From, State) ->
 	end,
 	NewState = State#state{files=NewConfirmedFiles, pending_files=NewPendingFiles},
     {reply, ignored, NewState};
+
 handle_call(_Request, _From, State) ->
     {reply, ignored, State}.
 

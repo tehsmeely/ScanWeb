@@ -154,11 +154,11 @@ $(function(){
 			append_li_with_link(ul, val)
 		});
 	}
-	function append_li_with_link(ul, text){
+	function append_li_with_link(ul, img_info){
 		var li = $( document.createElement('li') ),
 			a = $( document.createElement('a'));
-		a.attr('href', '/scans/'+text);
-		a.append(text);
+		a.attr('href', '/scans/'+img_info[0]);
+		a.append(img_info[1]);
 		li.append(a);
 		ul.append(li);
 	}

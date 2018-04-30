@@ -41,5 +41,13 @@ _rel/scanweb_release/bin/scanweb_release start
 
 ## Configure
 
----
+edit `priv/cfg/scanweb_conf.erl`
+The contents are an [erlang map](http://erlang.org/doc/man/maps.html) which provides the config to the application via the `config_server`. 
+Provide:
+Key | Description
+----|------------
+port | The port for the server to listen on
+hostname | Hostname of the hosting server, used for 
+scan_dir | Path of directory to save and serve the scanned files from
+
 
