@@ -49,7 +49,7 @@ Provide, keys as below:
 | Key | Description |
 | --- | ----------- |
 | port | The port for the server to listen on |
-| hostname | Hostname of the hosting server, used for |
+| hostname | Hostname of the hosting server, used for the websocket primarily |
 | scan_dir | Path of directory to save and serve the scanned files from |
 
 
