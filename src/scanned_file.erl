@@ -35,7 +35,7 @@ create(Int, IsNew) ->
 	RawFilename = io_lib:format("scan-~w.tiff",[Int]),
   Createdate = case IsNew of
     true ->
-      datetime_to_string(calendary:local_time());
+      datetime_to_string(calendar:local_time());
     false ->
       fetch_file_createdate(Filename)
   end,
@@ -68,14 +68,14 @@ num_of_file(Filename) ->
 
 fetch_file_createdate(Filename) ->
 	Scan_dir = config_server:query_config(scan_dir),
-  Filepath = filename:join(Scan_dir,Filename),
-  case file:read_file_info(Filepath) of
-    {ok, Info} ->
-      Mdate = Info#file_info.mtime,
-      datetime_to_string(Mdate);
-    {error, _Reason} ->
-      "Unknown"
-  end.
+	Filepath = filename:join(Scan_dir,Filename),
+	case file:read_file_info(Filepath) of
+	{ok, Info} ->
+	  Mdate = Info#file_info.mtime,
+	  datetime_to_string(Mdate);
+	{error, _Reason} ->
+	  "Unknown"
+	end.
 
 datetime_to_string({{Y, Mo, D},{H, Mi, S}}) ->
   io_lib:format("~4..0B/~2..0B/~2..0B - ~2..0B:~2..0B:~2..0B",[Y, Mo, D, H, Mi, S]).

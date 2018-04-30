@@ -15,7 +15,7 @@
 		scanInfo => #{}
 	}).
 
--define(TEST, true).
+-define(TEST, false).
 
 start_link() -> 
 	io:format("Scan server starting~n"),
