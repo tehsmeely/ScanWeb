@@ -43,7 +43,9 @@ _rel/scanweb_release/bin/scanweb_release start
 
 edit `priv/cfg/scanweb_conf.erl`
 The contents are an [erlang map](http://erlang.org/doc/man/maps.html) which provides the config to the application via the `config_server`. 
-Provide:
+
+Provide, keys as below:
+
 | Key | Description |
 | --- | ----------- |
 | port | The port for the server to listen on |
